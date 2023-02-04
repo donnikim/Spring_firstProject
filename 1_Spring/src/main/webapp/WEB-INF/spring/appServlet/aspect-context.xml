@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+<!-- LoggerAspect1 빈 등록  -->
+<!--  <bean id="LoggerAspect1" class="com.kh.spring.common.LoggerAspect1"/>-->
+
+	<!-- 선언적 aop방식 : xml버전 시작  -->
+	<!-- <aop:config>
+		<aop:aspect id="loggerAspect" ref="LoggerAspect1">
+			<aop:pointcut expression="execution(* com.kh.spring..*(..))" id="pcForAll"/>`
+			<aop:around method="loggerAdvice" pointcut-ref="pcForAll"/>
+		
+		
+		 </aop:aspect>
+	</aop:config> -->
+
+	<!-- 선언적 aop방식 : xml버전 끝  -->
+	
+	
+	<!-- 프로그래밍적 aop : annotation버전 시작  -->
+	<aop:aspectj-autoproxy/>
+	 <bean id="loggerAspect2" class="com.kh.spring.common.LoggerAspect2"/>
+	<!-- 프로그래밍적 aop : annotation버전 끝  -->
+	<!-- <tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="selectBoard"/>		
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+	
+		<aop:pointcut expression="execution(com.kh.spring.board.momsel.vo.Board com.kh.spring.board.model.service.BoardServiceImpl.selectBoard(int, boolean))" id=""/>
+		<aop:advisor advice-ref="txAdvice" point-ref="boardTx"/>
+	</aop:config>
+ -->
+	<tx:annotation-driven/>
+</beans>

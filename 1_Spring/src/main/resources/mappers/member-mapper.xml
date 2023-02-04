@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="memberMapper">
+	
+	<resultMap type="Member" id="memberResultSet">
+	<id column="ID" property="id"/>
+	<result column="PWD" property="pwd"/>
+	<result column="NAME" property="name"/>
+	<result column="NICKNAME" property="nickName"/>
+	<result column="EMAIL" property="email"/>
+	<result column="GENDER" property="gender"/>
+	<result column="AGE" property="age"/>
+	<result column="PHONE" property="phone"/>
+	<result column="ADDRESS" property="address"/>
+	<result column="ENROLL_DATE" property="enrollDate"/>
+	<result column="UPDATE_DATE" property="updateDate"/>
+	<result column="MEMBER_STATUS" property="status"/>
+	<result column="IS_ADMIN" property="isAdmin"/> 
+	</resultMap>
+	
+	<select id="login" resultMap="memberResultSet">
+		
+		select *
+		from member
+		where id=#{id} 
+			  <!--and pwd=#{pwd}  --> 
+			  and member_status='Y'
+
+	</select>
+	<insert id="insertMember" >
+	
+	insert into member 
+	values(#{id},#{pwd},#{name},#{nickName},#{email},#{gender},#{age},#{phone},#{address},SYSDATE,SYSDATE,DEFAULT,DEFAULT)
+	
+	</insert>
+	
+	<select id="selectMyList" resultType="map">
+
+		<![CDATA[
+			select bi_bt, board_title, bc_rc, md
+			from(select board_id bi_bt, board_title, to_char(board_count) bc_rc, board_modify_date md
+				from board
+				where board_writer=#{id}
+				order by board_id desc)
+			where rownum <=5
+			union
+			select *
+			from(select board_type-3, board_title, reply_content,reply_modify_date
+				from reply
+					join board on(board_id=ref_board_id)
+				where reply_writer=#{id}
+				order by reply_id desc)
+			where rownum<=5
+			order by bi_bt desc
+		]]>
+
+	</select>
+	<update id="updateMember">
+		
+		update member 
+		set name=#{name}, nickname=#{nickName}, email=#{email}, gender=#{gender}, age=#{age},phone=#{phone},address=#{address}, update_date=sysdate 
+		where id=#{id}
+	
+	
+	</update>
+
+
+	<update id="updatePwd">
+		update member
+		set pwd=#{newPwd}
+		where id=#{id}
+	</update>
+	
+	<update id="deleteMember">
+		update member
+		set member_status='N'
+		where id=#{id}
+	</update>
+	
+	<select id="checkId" resultType="_int">
+		select count(*)
+		from member
+		where id=#{id}
+	
+	</select>
+	<select id="checkNickName" resultType="_int">
+		select count(*)
+		from member
+		where nickname=#{nickName}
+	
+	</select>
+	
+	
+	<resultMap type="LoginLog" id="loginLogResultSet">
+		<id column="ID" property="id"/>
+		<result column="START_TIME" property="startTime"/>
+		<result column="DATE_TIME" property="dateTime"/>
+		<result column="LOGIN_CHECK" property="loginCheck"/>
+	</resultMap>
+	
+	<select id="searchLog" resultMap="loginLogResultSet">
+		select *
+		from Log
+		where id=#{id} and login_check='Y'
+	</select>
+	<insert id="insertTime">
+		insert into log log values (#{id},to_char(sysdate,'YYYY-MM-DD HH:MI:SS'),to_char(sysdate),'Y') 
+	
+	
+	</insert>
+	<update id="updateTime">
+		update log
+		set start_time=to_char(sysdate,'YYYY-MM-DD HH:MI:SS')
+		where id=#{id}
+	
+	</update>
+	<select id="loginCheck" resultMap="loginLogResultSet">
+		select *
+		from log
+		where id=#{id} and date_time=to_char(sysdate)	
+	</select>
+	<update id="updateCheck">
+		update log
+		set login_check='N'
+		where id=#{id} and login_check='Y'
+	</update>
+	
+</mapper>
